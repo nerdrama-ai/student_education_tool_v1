@@ -1,9 +1,10 @@
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
-
-import axios from "axios";
-import { useEffect, useState } from "react";
+// pages/index.tsx
 import FlashcardViewer from "../components/FlashcardViewer";
 import QuizPlayer from "../components/QuizPlayer";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 export default function Home() {
   const [records, setRecords] = useState<any[]>([]);
@@ -14,50 +15,42 @@ export default function Home() {
     setBusy(true);
     axios
       .get(`${BACKEND}/records`)
-      .then((r) => {
-        setRecords(r.data || []);
-      })
+      .then((r) => setRecords(r.data || []))
       .catch(() => {})
       .finally(() => setBusy(false));
   }, []);
 
   return (
-    <div className="min-h-screen p-8">
-      <header className="max-w-6xl mx-auto mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold accent">
-            Quizway — Student Education Tool
-          </h1>
-          <p className="text-sm text-gray-400">
-            Futuristic UI, improved continuity, production-ready layout
-          </p>
-        </div>
-        <nav className="flex gap-3 items-center">
-          <a
-            href="/admin"
-            className="btn-fut bg-white/4 px-4 py-2 rounded-md glass"
-          >
-            Admin
-          </a>
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              const dark = document.documentElement.classList.toggle("dark");
-              localStorage.setItem("theme", dark ? "dark" : "light");
-            }}
-            className="btn-fut glass"
-          >
-            Toggle Theme
-          </a>
-        </nav>
-      </header>
+    <div className="space-y-8">
+      <section className="grid grid-cols-12 gap-6 items-start">
+        <main className="col-span-8 space-y-6">
+          <div className="glass p-6 rounded-2xl">
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <h2 className="text-2xl font-bold">Play a Quiz</h2>
+                <p className="text-sm text-gray-300 mt-1">
+                  Fast, responsive quiz player with progress and accessibility
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  className="btn-fut glass"
+                  onClick={() => {
+                    const dark = document.documentElement.classList.toggle("dark");
+                    localStorage.setItem("theme", dark ? "dark" : "light");
+                  }}
+                >
+                  Toggle Theme
+                </button>
+                <a href="/admin" className="btn-fut glass">
+                  Admin
+                </a>
+              </div>
+            </div>
+          </div>
 
-      <main className="max-w-6xl mx-auto grid grid-cols-12 gap-6">
-        <section className="col-span-8 glass p-6 rounded-2xl">
-          <h2 className="text-xl font-semibold mb-4">Quiz Player</h2>
           <QuizPlayer />
-        </section>
+        </main>
 
         <aside className="col-span-4 space-y-6">
           <div className="glass p-4 rounded-xl">
@@ -69,31 +62,22 @@ export default function Home() {
                 {records.map((r) => (
                   <li
                     key={r.id}
-                    className={
-                      "p-3 rounded-md hover:scale-[1.01] transition transform cursor-pointer " +
-                      (selected?.id === r.id
-                        ? "ring-2 ring-purple-400"
-                        : "bg-white/2")
-                    }
                     onClick={() => setSelected(r)}
+                    className={
+                      "p-3 rounded-md transition transform cursor-pointer flex items-start justify-between " +
+                      (selected?.id === r.id ? "ring-2 ring-purple-400 bg-white/4" : "bg-white/3 hover:scale-[1.01]")
+                    }
                   >
-                    <div className="flex justify-between">
-                      <div>
-                        <div className="font-medium">
-                          {r.title || r.name || "Untitled"}
-                        </div>
-                        <div className="text-xs text-gray-400">
-                          {r.description || r.summary || ""}
-                        </div>
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        {new Date(
-                          r.created_at || r.createdAt || Date.now()
-                        ).toLocaleDateString()}
-                      </div>
+                    <div>
+                      <div className="font-medium">{r.title || r.name || "Untitled"}</div>
+                      <div className="text-xs text-gray-400 mt-1">{r.description || r.summary || ""}</div>
+                    </div>
+                    <div className="text-xs text-gray-400 ml-4">
+                      {new Date(r.created_at || r.createdAt || Date.now()).toLocaleDateString()}
                     </div>
                   </li>
                 ))}
+                {!records.length && <li className="text-sm text-gray-400">No records found</li>}
               </ul>
             )}
           </div>
@@ -104,13 +88,13 @@ export default function Home() {
           </div>
 
           <div className="glass p-4 rounded-xl">
-            <h3 className="font-semibold mb-3">Upload</h3>
+            <h3 className="font-semibold mb-3">Manage Content</h3>
             <a href="/admin" className="btn-fut glass block text-center">
-              Manage Content
+              Go to Admin Console
             </a>
           </div>
         </aside>
-      </main>
+      </section>
     </div>
   );
 }
