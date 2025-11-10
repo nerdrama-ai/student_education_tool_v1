@@ -4,9 +4,10 @@ import { useEffect } from 'react'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
-    // simple persisted theme
+    // initialize theme mode
     const mode = localStorage.getItem('theme') || 'dark'
     document.documentElement.classList.toggle('dark', mode === 'dark')
   }, [])
+
   return <Component {...pageProps} />
 }
