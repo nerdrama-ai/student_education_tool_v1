@@ -2,11 +2,11 @@ import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import { useEffect } from 'react'
 
-function MyApp({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
-    // add dark class by default
-    document.documentElement.classList.add('dark')
+    // simple persisted theme
+    const mode = localStorage.getItem('theme') || 'dark'
+    document.documentElement.classList.toggle('dark', mode === 'dark')
   }, [])
   return <Component {...pageProps} />
 }
-export default MyApp
