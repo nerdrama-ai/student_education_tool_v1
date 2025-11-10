@@ -1,3 +1,4 @@
+# backend/app/storage.py
 from typing import Dict
 from .models import UploadRecord
 from threading import Lock
@@ -25,3 +26,7 @@ def update_record(record_id: str, **kwargs):
             setattr(r, k, v)
         _store[record_id] = r
     return r
+
+def delete_record(record_id: str):
+    with _store_lock:
+        return _store.pop(record_id, None)
