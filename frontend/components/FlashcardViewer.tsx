@@ -1,22 +1,34 @@
-import { useState } from "react";
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
-export default function FlashcardViewer({ flashcards }: { flashcards: any[] }){
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+export default function FlashcardViewer() {
+  const [cards, setCards] = useState<any[]>([]);
   const [idx, setIdx] = useState(0);
-  const [showBack, setShowBack] = useState(false);
-  if(!flashcards || flashcards.length === 0) return <div className="text-sm text-gray-400">No flashcards yet</div>;
-  const fc = flashcards[idx];
+
+  useEffect(() => {
+    axios.get(`${BACKEND}/flashcards`).then((r) => setCards(r.data || []));
+  }, []);
+
+  if (!cards.length)
+    return <div className="text-sm text-gray-400">No flashcards</div>;
+
+  const c = cards[idx % cards.length];
   return (
     <div>
-      <div className="p-6 rounded border border-gray-800 text-center hover:cursor-pointer" onClick={()=> setShowBack(!showBack)}>
-        <div className="text-xl font-semibold mb-2">{ showBack ? fc.back : fc.front }</div>
-        <div className="text-xs text-gray-400">{ showBack ? 'Back' : 'Front'}</div>
+      <div className="glass p-4 rounded-lg">
+        <div className="font-semibold">{c.front}</div>
+        <div className="text-sm text-gray-400 mt-2">{c.back}</div>
       </div>
-
-      <div className="flex justify-between items-center mt-3">
-        <button className="px-3 py-1 bg-[#0b1f2a]" onClick={()=> { setIdx((idx-1+flashcards.length)%flashcards.length); setShowBack(false); }}>Prev</button>
-        <div className="text-sm text-gray-400">{idx+1} / {flashcards.length}</div>
-        <button className="px-3 py-1 bg-[#0b1f2a]" onClick={()=> { setIdx((idx+1)%flashcards.length); setShowBack(false); }}>Next</button>
+      <div className="flex gap-2 mt-3">
+        <button className="btn-fut glass" onClick={() => setIdx((i) => Math.max(0, i - 1))}>
+          Prev
+        </button>
+        <button className="btn-fut glass" onClick={() => setIdx((i) => i + 1)}>
+          Next
+        </button>
       </div>
     </div>
-  )
+  );
 }
